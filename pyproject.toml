@@ -1,0 +1,34 @@
+[project]
+name = "socioeconomic-data-mcp"
+version = "0.1.0"
+description = "Socio-Economic Data MCP server — official statistics APIs as Claude tools, with strict provenance and no data invention."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Socio-Economic Data MCP contributors" }]
+dependencies = [
+    "mcp>=1.10",
+    "httpx>=0.27",
+    "uvicorn>=0.30",
+    "starlette>=0.40",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+socioeconomic-data-mcp = "socioeconomic_data_mcp.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "live: tests that hit live provider APIs over the network",
+]
+testpaths = ["tests"]
+# Default run is offline; `pytest -m live` overrides this to run acceptance tests.
+addopts = "-m 'not live'"

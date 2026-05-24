@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Virtualenv
+.venv/
+venv/
+
+# Secrets / local config
+.env
+.claude/
+
+# OS
+.DS_Store
+
+# Not published: server-specific ops scripts + the build spec
+scripts/
+AKT_DataMCP_BuildBrief_for_ClaudeCode.md

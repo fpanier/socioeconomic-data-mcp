@@ -1,0 +1,16 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.OWNER/socioeconomic-data-mcp",
+  "description": "Unified MCP access to the world's official socio-economic data — Eurostat, World Bank, OECD, IMF, FRED, ECB, ILOSTAT, UN SDG, WHO, OWID, JRC ARDECO, plus DBnomics (~50 more providers) and any SDMX endpoint — one interface, full provenance, no invented values.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/OWNER/socioeconomic-data-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://YOUR_DOMAIN/mcp"
+    }
+  ]
+}
