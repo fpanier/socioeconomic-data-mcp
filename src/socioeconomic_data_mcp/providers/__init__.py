@@ -8,6 +8,7 @@ from . import (
     fred,
     ilostat,
     imf,
+    iweps,
     oecd,
     owid,
     sdmx,
@@ -17,6 +18,6 @@ from . import (
 )
 
 __all__ = [
-    "ardeco", "dbnomics", "ecb", "eurostat", "fred", "ilostat", "imf",
+    "ardeco", "dbnomics", "ecb", "eurostat", "fred", "ilostat", "imf", "iweps",
     "oecd", "owid", "sdmx", "unsdg", "who", "worldbank",
 ]

@@ -203,3 +203,14 @@ Sources: https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-acc
   REST export `https://territorial.ec.europa.eu/ardeco-api-v2/rest/export/{variable}?unit={unit}&version={nutsVersion}`
   → **CSV** `VERSIONS,LEVEL_ID,TERRITORY_ID,NAME_HTML,YEAR,DATE,UNIT,VALUE` (ALL regions/years,
   back to 1960). Server-side level/year/nutscode filters return empty → **filter client-side**.
+
+- **IWEPS WalStat ✅** REST `https://opendata.iweps.be/api/data/{csv|json}/{indicator}/{options}`
+  → CSV `ins,type_entite,entite,periode,<value>` (value column unnamed). Wallonia subnational only
+  (commune / arrondissement / province / Région wallonne = ins=3000). Options use `+` as separator:
+  `com+arr+prov` selects three levels at once, `ins=3000+period=last` filters by entity AND period.
+  **Quirk**: the API **rejects mixing `ins=` with a level keyword** in the same URL (returns 404),
+  so requesting `reg+prov` requires two calls (region via `ins=3000`, provinces via `prov`) merged
+  client-side. Catalog `https://opendata.iweps.be/statdcat-ap/walstat` (DCAT-RDF, twice/year).
+  **Code quirk**: catalog publishes codes with a dash (`201111-0`) but the API only accepts the
+  underscore form (`201111_0`) — the provider normalises on the way out of `search`.
+  Licence CC0. Public docs at `https://www.iweps.be/outils/open-data/`.

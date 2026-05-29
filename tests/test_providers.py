@@ -19,6 +19,7 @@ from socioeconomic_data_mcp.providers import (
     fred,
     ilostat,
     imf,
+    iweps,
     oecd,
     owid,
     sdmx,
@@ -128,6 +129,77 @@ def test_live_searches_find_codes():
     assert oecd.search("composite leading indicator")["results"]
     # token match across word order/extra words (substring match used to miss this)
     assert any(m["code"] == "NGDPDPC" for m in imf.search("GDP per capita")["results"])
+
+
+# --------------------------------------------------------------------------- #
+# IWEPS (Wallonia subnational, CC0)
+# --------------------------------------------------------------------------- #
+def test_iweps_parse_csv_minimal():
+    """Offline: parser maps the IWEPS CSV shape into the standard row contract."""
+    sample = (
+        '"ins","type_entite","entite","periode"\n'
+        '3000,Région,Wallonie,année 2025,3704990\n'
+        '20002,Province,Brabant Wallon,année 2025,415381\n'
+        '99999,Commune,Inconnue,année 2025,\n'  # missing observation
+    )
+    rows, _unit = iweps._parse_csv(sample)
+    assert len(rows) == 3
+    by_geo = {r["geo"]: r for r in rows}
+    assert by_geo["3000"]["value"] == 3704990.0
+    assert by_geo["3000"]["geo_label"] == "Wallonie"
+    assert by_geo["3000"]["geo_level"] == "Région"
+    assert by_geo["3000"]["time"] == "2025"  # "année 2025" → "2025"
+    # Empty observation → na (never invented)
+    assert by_geo["99999"]["value"] is None
+    assert by_geo["99999"]["flag"] == "na"
+
+
+def test_iweps_normalise_code():
+    """Catalog publishes 201111-0, API only accepts 201111_0 — search must convert."""
+    assert iweps._normalise_code("201111-0") == "201111_0"
+    assert iweps._normalise_code("200300_0") == "200300_0"  # already in API form
+    assert iweps._normalise_code("") == ""
+
+
+def _iweps_skip_if_down(res: dict) -> None:
+    """The IWEPS API occasionally returns an empty CSV when its DB is unreachable.
+    Skip live tests gracefully rather than fail the suite on a third-party outage."""
+    if res["metadata"]["n_rows"] == 0:
+        pytest.skip("IWEPS WalStat API returned no rows (transient outage upstream).")
+
+
+@pytest.mark.live
+def test_live_iweps_population_wallonie():
+    """End-to-end: population of the Walloon Region (ins=3000), latest year."""
+    res = iweps.get("200300_0", ins=["3000"], period="last")
+    assert res["metadata"]["provider"] == "iweps"
+    _iweps_skip_if_down(res)
+    assert res["metadata"]["n_rows"] == 1
+    row = res["data"][0]
+    assert row["geo"] == "3000"
+    assert row["geo_label"] == "Wallonie"
+    assert isinstance(row["value"], (int, float))
+    assert row["value"] > 3_000_000  # sanity (Wallonia ~3.7M)
+
+
+@pytest.mark.live
+def test_live_iweps_reg_plus_prov_merged():
+    """When 'reg' and 'prov' are both requested, the provider makes two API
+    calls and merges them — the API itself rejects mixing ins= with a level."""
+    res = iweps.get("200300_0", levels=["reg", "prov"], period="last")
+    _iweps_skip_if_down(res)
+    geos = {r["geo"] for r in res["data"]}
+    assert "3000" in geos  # Walloon Region
+    assert {"20002", "50000", "60000", "80000", "90000"} <= geos  # 5 provinces
+
+
+@pytest.mark.live
+def test_live_iweps_search_returns_normalised_codes():
+    res = iweps.search("population", limit=5)
+    if res["metadata"]["n_results"] == 0:
+        pytest.skip("IWEPS catalog unreachable (transient).")
+    for r in res["results"]:
+        assert "-" not in r["code"], f"search returned unconverted code: {r['code']}"
 
 
 # --------------------------------------------------------------------------- #

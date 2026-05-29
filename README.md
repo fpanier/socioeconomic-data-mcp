@@ -29,7 +29,7 @@ tidy `{metadata, data, csv}` shape.
   one call.
 - **Self‑hosted & open** — you own the endpoint, the auth, the rate‑limiting.
 
-## Providers & tools (15 tools)
+## Providers & tools (16 tools)
 
 | Tool | Source | Coverage |
 | --- | --- | --- |
@@ -46,6 +46,7 @@ tidy `{metadata, data, csv}` shape.
 | `dbnomics_get` | **DBnomics** | **federates ~50 providers** (INSEE, Bundesbank, BIS, BLS…) |
 | `sdmx_get` | **any SDMX 2.1 endpoint** | national stat offices / central banks |
 | `ardeco_get` | JRC **ARDECO** | EU regional (NUTS) long series since 1960 |
+| `iweps_get` | **IWEPS WalStat** | **Wallonia subnational** (commune / arrondissement / province / region — CC0) |
 | `search_datasets(provider, query)` | — | find dataset/indicator codes |
 | `describe_dataset(provider, dataset)` | — | dimensions, valid codes, units, latest period |
 

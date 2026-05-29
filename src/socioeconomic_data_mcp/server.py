@@ -35,6 +35,7 @@ from .providers import (
     fred,
     ilostat,
     imf,
+    iweps,
     oecd,
     owid,
     sdmx,
@@ -47,7 +48,7 @@ logger = logging.getLogger("socioeconomic_data_mcp")
 
 _SUPPORTED_PROVIDERS = (
     "eurostat", "worldbank", "oecd", "imf", "fred", "ecb", "ilostat", "unsdg", "who", "owid",
-    "dbnomics", "ardeco",
+    "dbnomics", "ardeco", "iweps",
 )
 
 
@@ -369,6 +370,30 @@ def ardeco_get(
     return ardeco.get(variable, unit, version, nuts_level, regions, start, end)
 
 
+@mcp.tool()
+def iweps_get(
+    indicator: str,
+    levels: list[str] | None = None,
+    ins: list[str] | None = None,
+    period: str | None = None,
+) -> dict:
+    """Fetch an IWEPS WalStat indicator — Wallonia subnational statistics (CC0).
+    Returns {metadata, data, csv}; rows have geo (INS code), geo_label, geo_level,
+    time (year), value, flag.
+
+    Args:
+        indicator: WalStat code with sub-index, e.g. "200300_0" (population) — see
+            search_datasets provider="iweps". The base code "200300" usually has 1-15
+            variants (200300_0..200300_14) with different breakdowns (sex, age, etc.).
+        levels: geographic levels — any of {"com","arr","prov","reg"}. Defaults to
+            ["reg","prov"] (Walloon Region + 5 provinces).
+        ins: optional list of INS codes to keep only specific entities (e.g. ["3000"]
+            for Walloon Region only).
+        period: "last" for the most-recent observation only, or a year like "2024".
+    """
+    return iweps.get(indicator, levels, ins, period)
+
+
 _DESCRIBE = {
     "eurostat": eurostat.describe,
     "worldbank": worldbank.describe,
@@ -381,6 +406,7 @@ _DESCRIBE = {
     "who": who.describe,
     "owid": owid.describe,
     "ardeco": ardeco.describe,
+    "iweps": iweps.describe,
 }
 _SEARCH = {
     "eurostat": eurostat.search,
@@ -395,6 +421,7 @@ _SEARCH = {
     "owid": owid.search,
     "dbnomics": dbnomics.search,
     "ardeco": ardeco.search,
+    "iweps": iweps.search,
 }
 
 
